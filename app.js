@@ -5,7 +5,8 @@ var bodyParser = require('body-parser');
 var amqp = require('amqplib/callback_api');
 
 const port = process.env.PORT || 3000;
-const queue = process.env.QUEUE_NAME
+const queue = process.env.QUEUE_NAME;
+var counter = 0;
 
 app.use(bodyParser.json())
 
@@ -23,12 +24,16 @@ app.post('/webhook', (req, res) => {
   res.status(200).send('Sent ' + msg);
 
   sendToQueue(msg)
-
+  
   function sendToQueue(msg) {
+
+    counter++
+
     amqp.connect('amqp://localhost', function (error0, connection) {
       if (error0) {
         throw error0;
       }
+
       connection.createChannel(function (error1, channel) {
         if (error1) {
           throw error1;
@@ -41,14 +46,15 @@ app.post('/webhook', (req, res) => {
         channel.sendToQueue(queue, Buffer.from(msg));
 
         console.log(" [x] Sent %s", msg);
+        console.log("========> count: " + counter)
       });
 
-      // setTimeout(function () {
-      //   connection.close();
-      //   process.exit(0);
-      // }, 500);
-
+      setTimeout(function () {
+        connection.close();
+        //process.exit(0);
+      }, 500);
     });
+
   }
 
 });
