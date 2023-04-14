@@ -6,12 +6,12 @@ var amqp = require('amqplib/callback_api');
 
 const port = process.env.PORT || 3000;
 const queue = process.env.QUEUE_NAME;
-var counter = 0;
+let counter = 0;
 
 app.use(bodyParser.json())
 
 app.listen(port, () => {
-  console.log(`A API está sendo executada na porta ${port}`);
+  console.log(`A API está sendo executada na porta ${port} contador: ${counter}`);
 });
 
 app.get('/', (req, res) => {
@@ -20,14 +20,17 @@ app.get('/', (req, res) => {
 
 app.post('/webhook', (req, res) => {
 
-  var msg = JSON.stringify(req.body);
-  res.status(200).send('Sent ' + msg);
+  //var msg = JSON.stringify(req.body);
+  //res.status(200).send('Sent ' + msg);
+  res.status(200).send("ok")
+  counter++
+  console.log("========> count: " + counter)
 
-  sendToQueue(msg)
+  //sendToQueue(msg)
   
   function sendToQueue(msg) {
 
-    counter++
+    //counter++
 
     amqp.connect('amqp://localhost', function (error0, connection) {
       if (error0) {
